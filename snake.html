@@ -3,17 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Game</title>
+  <title>Snake</title>
   <style>
     canvas {
       border: 1px solid #000;
       display: block;
       margin: 20px auto;
     }
+
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
   <canvas id="snakeCanvas" width="400" height="400"></canvas>
+  <button id="playButton">Játék</button>
 
   <script>
     const canvas = document.getElementById("snakeCanvas");
@@ -23,8 +31,8 @@
     let snake = [{ x: 10, y: 10 }];
     let food = { x: 15, y: 15 };
     let score = 0;
-
     let direction = "right";
+    let game;
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -35,22 +43,26 @@
         ctx.strokeStyle = "#fff";
         ctx.strokeRect(snake[i].x * boxSize, snake[i].y * boxSize, boxSize, boxSize);
       }
+
       ctx.fillStyle = "#FFC107";
       ctx.fillRect(food.x * boxSize, food.y * boxSize, boxSize, boxSize);
       ctx.strokeStyle = "#fff";
       ctx.strokeRect(food.x * boxSize, food.y * boxSize, boxSize, boxSize);
+
       ctx.fillStyle = "#000";
       ctx.font = "20px Arial";
-      ctx.fillText("Score: " + score, 10, 30);
+      ctx.fillText("Pontszám: " + score, 10, 30);
     }
 
     function move() {
       let headX = snake[0].x;
       let headY = snake[0].y;
+
       if (direction === "right") headX++;
       else if (direction === "left") headX--;
       else if (direction === "up") headY--;
       else if (direction === "down") headY++;
+
       if (headX === food.x && headY === food.y) {
         score++;
         food = {
@@ -60,6 +72,7 @@
       } else {
         snake.pop();
       }
+
       if (
         headX < 0 || headY < 0 ||
         headX >= canvas.width / boxSize ||
@@ -67,10 +80,11 @@
         collision(headX, headY, snake)
       ) {
         clearInterval(game);
-        alert("Game Over! Your score is " + score);
+        alert("Játék vége! A te pontszámod: " + score);
         resetGame();
         return;
       }
+
       snake.unshift({ x: headX, y: headY });
     }
 
@@ -88,7 +102,12 @@
       food = { x: 15, y: 15 };
       score = 0;
       direction = "right";
+      document.getElementById("playButton").disabled = false;
+    }
+
+    function startGame() {
       game = setInterval(main, 100);
+      document.getElementById("playButton").disabled = true;
     }
 
     function main() {
@@ -96,13 +115,14 @@
       draw();
     }
 
+    document.getElementById("playButton").addEventListener("click", startGame);
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "ArrowUp" && direction !== "down") direction = "up";
       else if (event.key === "ArrowDown" && direction !== "up") direction = "down";
       else if (event.key === "ArrowLeft" && direction !== "right") direction = "left";
       else if (event.key === "ArrowRight" && direction !== "left") direction = "right";
     });
-    let game = setInterval(main, 100);
   </script>
 </body>
 </html>
